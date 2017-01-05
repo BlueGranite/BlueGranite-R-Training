@@ -1,0 +1,102 @@
+## Vectors 
+
+Use the `typeof` function to explore the data structure's low-level structure, and the `class` object to see the object's higher level structure.
+
+```{r vectors}
+random_norms <- rnorm(100)
+typeof(random_norms)
+class(random_norms)
+
+some_letters <- letters[1:10]
+typeof(some_letters)
+class(some_letters)
+
+int_vector <- c(1L, 2L, 3L)
+typeof(int_vector)
+class(int_vector)
+
+booleans <- int_vector == 1
+typeof(booleans)
+class(booleans)
+```
+
+can you mix types in a vector?
+
+```{r coercion}
+combine_char_num <- c(random_norms, some_letters)
+typeof(combine_char_num)
+```
+
+## Lists
+
+to combine types, make list
+
+```{r list}
+list_char_num <- list(nums = random_norms, chars = some_letters)
+typeof(list_char_num)
+lapply(list_char_num, typeof)
+```
+
+## Matrices
+
+matrices, same length, same type
+
+```{r matrices}
+matrix_num <- matrix(rnorm(10), nrow = 5, ncol = 2)
+# reuse
+matrix_num_reuse <- matrix(rnorm(11), nrow = 6, ncol = 4)
+matrix_mix <- matrix(c(rnorm(10), letters[1:10]), nrow = 10, ncol = 2)
+typeof(matrix_mix)
+```
+
+
+## data.frames
+
+To mix elements in a rectangular object/table, use `data.frames`:
+
+```{r dfs}
+df_char_num <- data.frame(chars = letters[1:10], nums = rnorm(10))
+lapply(df_char_num, typeof)
+
+## data.frames must have same length in each column
+df_char_num <- data.frame(chars = letters[1:8], nums = rnorm(10))
+
+```
+
+## Helpful Functions
+
+
+```{r}
+
+# see your workspace
+ls()
+
+
+# check working directory, change directory
+getwd()
+setwd(getwd())
+
+# create a sequence of numbers
+1:10
+seq(1, 10)
+seq(1, 10, 2)
+
+# get help
+?seq
+help(seq)
+
+# type tests
+
+is.character(some_letters)
+is.numeric(some_letters)
+is.atomic(some_letters)
+is.atomic(df_char_num)
+
+# remove object from workspace
+rm(some_letters)
+
+# remove all visible objects
+
+rm(list = ls())
+
+```
