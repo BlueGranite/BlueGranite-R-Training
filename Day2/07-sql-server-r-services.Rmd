@@ -33,7 +33,7 @@ library(RevoScaleR)
 ```{r 7.02 - connection string}
 # Define the connection string
 # This walkthrough requires SQL authentication
-connStr <- "Driver=SQL Server;Server=localhost;Database=nyctaxi;Uid=training;Pwd=RTraining1!"
+connStr <- "Driver=SQL Server;Server=localhost;Database=nyctaxi;Trusted_Connection=Yes"
 ```
 
 ```{r 7.03 - compute context}
