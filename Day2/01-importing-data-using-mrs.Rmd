@@ -1,0 +1,82 @@
+---
+title: "Importing Data with Microsoft R Server"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
+```
+
+```{r 1.01}
+col_classes <- c('VendorID' = "factor",
+                 'tpep_pickup_datetime' = "character",
+                 'tpep_dropoff_datetime' = "character",
+                 'passenger_count' = "integer",
+                 'trip_distance' = "numeric",
+                 'pickup_longitude' = "numeric",
+                 'pickup_latitude' = "numeric",
+                 'RateCodeID' = "factor",
+                 'store_and_fwd_flag' = "factor",
+                 'dropoff_longitude' = "numeric",
+                 'dropoff_latitude' = "numeric",
+                 'payment_type' = "factor",
+                 'fare_amount' = "numeric",
+                 'extra' = "numeric",
+                 'mta_tax' = "numeric",
+                 'tip_amount' = "numeric",
+                 'tolls_amount' = "numeric",
+                 'improvement_surcharge' = "numeric",
+                 'total_amount' = "numeric")
+```
+
+It is a good practice to also load a sample of the data as a `data.frame` in R.  When we want to apply a function to the XDF data, we can first apply it to the `data.frame` where it's easier and faster to catch errors, before applying it to the whole data.  We will later learn a method for taking a random sample from the data, but for now the sample simply consists of the first 1000 rows.
+
+
+```{r 1.02}
+input_csv <- 'yellow_tripdata_2015-01.csv'
+# we take a chunk of the data and load it as a data.frame (good for testing things)
+nyc_sample_df <- read.csv(input_csv, nrows = 1000, colClasses = col_classes)
+head(nyc_sample_df)
+```
+
+
+
+
+
+
+Our first task is to read the data using MRS. MRS has two ways of dealing with flat files: (1) it can work directly with the flat files, meaning that it reads and writes to flat files directly, (2) it can covert flat files to a format called XDF (XDF stands for external data frame).  An XDF file is much smaller than a CSV file because it is compressed.  Its main advantage over a CSV file is that an XDF file can be read and processed much faster than a CSV file (we will run some benchmarks to see how much faster).  The disadvantage of an XDF file format is a format that only MRS understands and can work with.  So in order to decide whether we chose XDF or CSV we need to understand the tradeoffs involved:
+
+1. Converting from CSV to XDF is itself a cost in terms of runtime.
+2. Once the original CSVs are converted to XDFs, the runtime of processing (reading from and sometimes writing to) the XDFs is lower than what the it would have been if we had directly processed the CSVs instead.
+
+Since an anlytics workflow usually consists of cleaning and munging data, and then feeding that to various modeling and data-mining algorithms, the initial runtime of converting from CSV to XDF is quickly offset by the reduced runtime of working with the XDF file.  However, one-off kinds of analyses on datasets that are ready to be fed to the modeling algorithm might run faster if we skip XDF conversion.
+
+We use the `rxImport` function to covert flat files to XDF files. By letting `append = "rows"`, we can also combine multiple flat files into a single XDF file.
+
+
+```{r 1.03}
+input_xdf <- 'yellow_tripdata_2015.xdf'
+st <- Sys.time()
+rxImport(input_csv, input_xdf, colClasses = col_classes, overwrite = TRUE)
+
+for(ii in 2:3) { # get each month's data and append it to the first month's data
+ input_csv <- sprintf('yellow_tripdata_2015-%02d.csv', ii)
+ rxImport(input_csv, input_xdf, colClasses = col_classes, overwrite = TRUE, append = "rows")
+ print(input_csv)
+}
+Sys.time() - st # stores the time it took to import
+```
+
+    Rows Processed: 12748986 
+    Rows Processed: 12450521 
+    [1] "yellow_tripdata_2015-02.csv"
+    Rows Processed: 13351609 
+    [1] "yellow_tripdata_2015-03.csv"
+    
+
+
+
+
+    Time difference of 8.938163 mins
+

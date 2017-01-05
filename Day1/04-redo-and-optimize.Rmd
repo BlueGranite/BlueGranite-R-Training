@@ -1,0 +1,138 @@
+---
+title: "Optimize"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 4: Optimize
+
+Before we move to the next exciting section about feature creation, we need to take a quick step back and revisit what we've so far done with an eye toward doing it more efficiently and in fewer steps. Often when doing exploratory data analysis we don't know much about the data ahead of time and need to learn as we go. But once we have the basics down, we can find shortcuts for some of the data-processing jobs. This is especially helpful if we indend to use the data to generate regular reports or somehow in a production environment. Therefore, in this section, we go back to the original CSV file and load it into R and redo all the data-cleaning to bring the data to where we left it off in the last section. But as you will see, we take a slightly different approach to do it.
+
+Our approach in the last few sections was to load the data, and process it by 'cleaning' each column.  But some of the steps we took could have been taken at the time we loaded the data. We sometime refer to this as **pre-processing**. Pre-processing can speed up reading the data and allow us to skip certain steps. It is useful to read data as we did in section 1 for the sake of exploring it, but in a production environment where efficiency matters these small steps can go a long way in optimizing the workflow.
+
+We are now going to read the CSV file again, but add a few additional steps so we can tell it which type each column needs to have (we can use `NULL` when we wish the column dropped) and the name we wish to give to each column. We store the column types and names in a `data.frame` called `vt` for ease of access.
+
+
+```{r 4.01}
+setwd('C:/Data/NYC_taxi')
+data_path <- 'NYC_sample.csv'
+
+vartypes <- "varname vartype
+vendor_id NULL
+pickup_datetime character
+dropoff_datetime character
+passenger_count integer
+trip_distance numeric
+pickup_longitude numeric
+pickup_latitude numeric
+rate_code_id factor
+store_and_fwd_flag NULL
+dropoff_longitude numeric
+dropoff_latitude numeric
+payment_type factor
+fare_amount numeric
+extra numeric
+mta_tax numeric
+tip_amount numeric
+tolls_amount numeric
+improvement_surcharge numeric
+total_amount numeric"
+
+vt <- read.table(textConnection(vartypes), header = TRUE, sep = " ", stringsAsFactors = FALSE)
+
+st <- Sys.time()
+nyc_taxi <- read.table(data_path, skip = 1, header = FALSE, sep = ",", 
+                       colClasses = vt$vartype, col.names = vt$varname)
+Sys.time() - st
+
+head(nyc_taxi)
+```
+
+
+
+
+    Time difference of 15.9 secs
+
+
+
+
+
+
+Reading the data the way we did above means we can now skip some steps, such as factor conversions, but we have still have some work left before we get the data to where it was when we left it in the last section.
+
+Before we do so, let's quickly review the two ways we leared to both query and transform data: We can query and transform data using a direct approach, or we can do so using functions such as `subset` and `transform`. The notation for the latter is cleaner and easier to follow. The two different approaches are shown in the table below. Additionally, we now introduce a third way performing the above two tasks: by using the popular `dplyr` package. `dplyr` has a host of functions for querying, processing, and summarizing data. We learn more about its querying and processing capabilities in this section and the next, and about how to summarize data with `dplyr` in the section about data summaries.
+
+| task           | direct approach                  | using `base` functions                       | using `dplyr` functions              |
+|----------------|----------------------------------|----------------------------------------------|--------------------------------------|
+| query data     | `data[data$x > 10, c('x', 'y')]` | `subset(data, x > 10, select = c('x', 'y'))` | `select(filter(data, x > 10), x, y)` |
+| transform data | `data$z <- data$x + data$y`      | `transform(data, z = x + y)`                 | `mutate(data, z = x + y)`            |
+
+As we can see in the above table, `dplyr` has two functions called `mutate` and `filter`, and in notation they  mirror `transform` and `subset` respectively. The one differnce is that `subset` has an argument called `select` for selecting specific columns, whereas `dplyr` has a function called `select` for doing so (and the column names we pass are unquoted). 
+
+We cover more of `dplyr` in the next two sections to give you a chance to get comfortable with the `dplyr` functions and their notation, and it's in section 6 that we really gain an appreciation for `dplyr` and its simple notation for creating complicated data pipelines.
+
+In this section, we use `dplyr` to redo all the transformations to clean the data. This will essentially consist of using `mutate` instead of `transform`. Beyond simply changing function names, `dplyr` functions are generally more efficient too.
+
+Here's what remains for us to do:
+
+  1. Convert the datetime variable to the proper format
+  2. Replace the unusual geographical coordinates for pick-up and drop-off with NAs
+  3. Assign the proper labels to the factor levels and drop any unnecessary factor levels (in the case of `payment_type`)
+
+We can handle items (1) and (2) in here:
+
+
+```{r 4.02}
+library(lubridate)
+library(dplyr)
+nyc_taxi <- mutate(nyc_taxi, 
+                   dropoff_longitude = ifelse(pickup_longitude < -75 | pickup_longitude > -73, NA, dropoff_longitude),
+                   dropoff_longitude = ifelse(dropoff_longitude < -75 | dropoff_longitude > -73, NA, dropoff_longitude),
+                   pickup_latitude = ifelse(pickup_latitude < 38 | pickup_latitude > 41, NA, pickup_latitude),
+                   dropoff_latitude = ifelse(dropoff_latitude < 38 | dropoff_latitude > 41, NA, dropoff_latitude),
+                   pickup_datetime = ymd_hms(pickup_datetime, tz = "US/Eastern"),
+                   dropoff_datetime = ymd_hms(dropoff_datetime, tz = "US/Eastern"))
+```
+
+For item (3) we have two things to do: firstly, `rate_code_id` is a factor now, but we still need to assign the propor labels it.
+
+
+```{r 4.03}
+levels(nyc_taxi$rate_code_id) <- c('standard', 'JFK', 'Newark', 'Nassau or Westchester', 'negotiated', 'group ride', 'n/a')
+```
+
+Secondly, `payment_type` is also a factor, but with all six levels, so we need to 'refactor' it so we can only keep the top two.
+
+
+```{r 4.04}
+table(nyc_taxi$payment_type, useNA = "ifany") # we can see all different payment types
+```
+
+
+
+
+    
+         1      2      3      4 
+    483012 284288   2495    859 
+
+
+
+
+```{r 4.05}
+nyc_taxi <- mutate(nyc_taxi, payment_type = factor(payment_type, levels = 1:2, labels = c('card', 'cash')))
+table(nyc_taxi$payment_type, useNA = "ifany") # other levels turned into NAs
+```
+
+
+
+
+    
+      card   cash   <NA> 
+    483012 284288   3354 
+
+
+
+We now have the data to where it was when we left it at the end of the previous section. In the next section, we work on adding new features (columns) to the data.

@@ -1,0 +1,91 @@
+---
+title: "Importing Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
+```
+
+## Section 1: Loading data into R
+
+The process of loading data into R changes based on the kind of data. The standard format for data is tabular.  A CSV file is an example of tabular data.  Assuming that our CSV file is "clean", we should be able to read the file using the `read.csv` function.  Here are examples of what we mean by "clean" data for a CSV file:
+
+  - column headers are at the top
+  - rows all have an equal number of cells, with two adjacent commas representing an empty cell
+  - file only contains the data, with all other metadata stored in a separate file referred to as the **data dictionary**
+
+We use the `readLines` function in R to print the first few lines of the data.  This can serve as a starting point for examining the data.
+
+
+```{r 1.01 file preview}
+#setwd('C:/Data/NYC_taxi')
+
+data_path <- 'NYC_sample.csv'
+print(readLines(file(data_path), n = 3)) # print the first 3 lines of the file
+```
+
+    [1] "vendorid,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,pickup_longitude,pickup_latitude,ratecodeid,store_and_fwd_flag,dropoff_longitude,dropoff_latitude,payment_type,fare_amount,extra,mta_tax,improvement_surcharge,tip_amount,tolls_amount,total_amount"
+    [2] "1,2016-01-29 09:29:04,2016-01-29 09:39:46,1,1.40,-73.994697570800781,40.725814819335938,1,N,-73.985877990722656,40.743446350097656,1,8.5,0,0.5,1,0,0.3,10.3"
+    [3] "1,2016-01-29 09:29:09,2016-01-29 09:37:48,1,2.60,-73.974021911621094,40.746917724609375,1,N,-73.978782653808594,40.713676452636719,1,10.5,0,0.5,1,0,0.3,12.3"                                                                                                                                                                       
+    
+
+Before we run `read.csv` to load the data into R, let's inspect it more closely by looking at the R help documentation. We can do so by typing `?read.csv` from the R console.
+
+As we can see from the help page above, `read.csv` is an offshoot of the more general function `read.table` with some of the arguments set to default values appropriate to CSV files (such as `sep = ','` or `header = TRUE`).  There are many arguments in `read.table` worth knowing about, such as (just to name a few)
+  - `nrows` for limiting the number of rows we read, 
+  - `na.strings` for specifying what defines an NA in a `character` column,  
+  - `skip` for skipping a certain number of rows before we start reading the data.
+
+We now run `read.csv`.  Since the dataset we read is relatively large, we time how long it takes to load it into R.  Once all the data is read, we have an object called `nyc_taxi` loaded into the R session.  This object is an R `data.frame`.  We can run a simple query on `nyc_taxi` by passing it to the `head` function.
+
+
+```{r 1.02 file load }
+st <- Sys.time()
+nyc_taxi <- read.csv(data_path, stringsAsFactors = FALSE) # we suppress conversion to factors for now
+Sys.time() - st
+```
+
+
+
+
+    Time difference of 41.5 secs
+
+
+
+
+```{r 1.03 get class}
+print(class(nyc_taxi))
+```
+
+    [1] "data.frame"
+    
+
+It is important to know that `nyc_taxi` is no longer linked to the original CSV file: The CSV file resides somewhere on disk, but `nyc_taxi` is a **copy** of the CSV file sitting in memory.  Any modifications we make to this file will not be written to the CSV file, or any file on disk, unless we explicitly do so.  Let's begin by comparing the size of the original CSV file with the size of its copy in the R session.
+
+
+```{r 1.04 get size in memory}
+obj_size_mb <- as.integer(object.size(nyc_taxi)) / 2^20 # size of object in memory (we divide by 2^20 to convert from bytes to megabytes)
+print(obj_size_mb)
+```
+
+    [1] 361
+    
+
+
+```{r 1.05 compare to size on disk}
+file_size_mb <- file.size(data_path) / 2^20 # size of the original file
+print(file_size_mb)
+```
+
+
+    [1] 206
+    
+
+
+As we can see, the object in the memory takes up more space (in memory) than the CSV file does on disk.  Since the amount of available memory on a computer is much smaller than available disk space, for a long time the need to load data in its entirety in the memory imposed a serious limitation on using R with large datasets.  Over the years, machines have been endowed with more CPU power and more memory, but data sizes have grown even more, so fundamentally the problem is still there.  As we become better R programmers, we can learn ways to more efficiently load and process the data, but writing efficient R code is not always easy or even desirable if the resulting code looks hard to read and understand.
+
+Nowadays there are R libraries that provide us with ways to handle large datasets in R quickly and without hogging too much memory.  Microsoft R Server's `RevoScaleR` library is an example of such a package.  `RevoScaleR` is covered on Day 2.
+
+With the data loaded into R, we can now set out to examine its content, which is the subject of the next chapter.
