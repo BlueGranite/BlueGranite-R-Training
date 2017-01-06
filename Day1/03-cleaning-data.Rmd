@@ -171,26 +171,9 @@ For example, here we ask which bucket does 5.6 fall into?
 cut(5.6, c(0, 4, 10, Inf)) # 5.6 is in the range (4-10]
 ```
 
-
-
-
-(4,10]
-
-
-
-
 ```{r 3.15}
 table(c(1, 1, 2, 2, 2, 3)) # provides counts of each distinct value
 ```
-
-
-
-
-    
-    1 2 3 
-    2 3 1 
-
-
 
 Take a moment to familiarize yourself with both functions by modifying the above examples. We will be using both functions a few times throughout the course.
 
@@ -214,15 +197,6 @@ ggplot(data = nyc_taxi) +
 bucket_boundaries <- c(-Inf, -75, -73, -1, 1, Inf)
 table(cut(nyc_taxi$pickup_longitude, bucket_boundaries)) # solution to (B)
 ```
-
-
-
-
-    
-    (-Inf,-75]  (-75,-73]   (-73,-1]     (-1,1]   (1, Inf] 
-             8     757355          2      13288          1 
-
-
 
 ---
 
@@ -257,21 +231,6 @@ If we rerun `summary` we can see the counts for NAs as part of the summary now:
 ```{r 3.20}
 summary(nyc_taxi[ , grep('long|lat', names(nyc_taxi), value = TRUE)])
 ```
-
-
-
-
-     pickup_longitude pickup_latitude dropoff_longitude dropoff_latitude
-     Min.   :-75      Min.   :38      Min.   :-75       Min.   :39      
-     1st Qu.:-74      1st Qu.:41      1st Qu.:-74       1st Qu.:41      
-     Median :-74      Median :41      Median :-74       Median :41      
-     Mean   :-74      Mean   :41      Mean   :-74       Mean   :41      
-     3rd Qu.:-74      3rd Qu.:41      3rd Qu.:-74       3rd Qu.:41      
-     Max.   :-73      Max.   :41      Max.   :-73       Max.   :41      
-     NA's   :13299    NA's   :13337   NA's   :12965     NA's   :13092   
-
-
-
 
 ### Exercise 3.3
 
