@@ -82,7 +82,7 @@ nyc_taxi[1:5, -(1:4)] # rows 1 through 5, except columns 1 through 4
 ```
 
 ```{r 2.09 slice 3}
-nyc_taxi[1:5, ] # all the columns, first 10 rows
+nyc_taxi[1:5, ] # all the columns, first 5 rows
 ```
 
 ```{r 2.10 new df}

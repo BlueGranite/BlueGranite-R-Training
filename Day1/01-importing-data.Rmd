@@ -22,7 +22,7 @@ We use the `readLines` function in R to print the first few lines of the data.  
 ```{r 1.01 file preview}
 #setwd('C:/Data/NYC_taxi')
 
-data_path <- 'NYC_sample.csv'
+data_path <- 'C:\\Data\\NYC_Taxi\\NYC_Sample.csv'
 print(readLines(file(data_path), n = 3)) # print the first 3 lines of the file
 ```
                                                                                                                                       Before we run `read.csv` to load the data into R, let's inspect it more closely by looking at the R help documentation. We can do so by typing `?read.csv` from the R console.
