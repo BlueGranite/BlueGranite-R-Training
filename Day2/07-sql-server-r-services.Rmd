@@ -7,13 +7,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-# PreRequisites: You have installed Revolution R Enterprise 7.5.0 or higher on the machine and SQL Server 2016 CTP3 or higher on the database server
-# Change R version in R Studio on Data Science VM to "[64-bit] C:\Program Files\Microsoft SQL Server\130\R_SERVER"
-# Verify that "training" SQL user exists and has access to the nyctaxi database
-# Install required R libraries for this walkthrough if they are not installed. 
-
 ```{r 7.01 - packages}
+#Prerequisites: You have installed Revolution R Enterprise 7.5.0 or higher on the machine and SQL Server 2016 CTP3 or higher on the database server
+#Change R version in R Studio on Data Science VM to "[64-bit] C:\Program Files\Microsoft SQL Server\130\R_SERVER"
+#Verify that "training" SQL user exists and has access to the nyctaxi database
+#Install required R libraries for this walkthrough if they are not installed. 
+
 if (!('ggmap' %in% rownames(installed.packages()))){
   install.packages('ggmap')
 }
