@@ -22,37 +22,9 @@ In the last section, we proposed ways that we could clean the data. In this sect
 
 Run `summary` on the data.
 
-
 ```{r 3.01}
 summary(nyc_taxi)
 ```
-
-
-
-
-        VendorID    tpep_pickup_datetime tpep_dropoff_datetime passenger_count trip_distance     pickup_longitude
-     Min.   :1.00   Length:770654        Length:770654         Min.   :0.00    Min.   :      0   Min.   :-122.2  
-     1st Qu.:1.00   Class :character     Class :character      1st Qu.:1.00    1st Qu.:      1   1st Qu.: -74.0  
-     Median :2.00   Mode  :character     Mode  :character      Median :1.00    Median :      2   Median : -74.0  
-     Mean   :1.52                                              Mean   :1.68    Mean   :     27   Mean   : -72.7  
-     3rd Qu.:2.00                                              3rd Qu.:2.00    3rd Qu.:      3   3rd Qu.: -74.0  
-     Max.   :2.00                                              Max.   :9.00    Max.   :8000030   Max.   :   9.9  
-     pickup_latitude  rate_code_id store_and_fwd_flag dropoff_longitude dropoff_latitude  payment_type   fare_amount  
-     Min.   :  0     Min.   : 1    Length:770654      Min.   :-121.9    Min.   : 0.0     Min.   :1.00   Min.   :-142  
-     1st Qu.: 41     1st Qu.: 1    Class :character   1st Qu.: -74.0    1st Qu.:40.7     1st Qu.:1.00   1st Qu.:   6  
-     Median : 41     Median : 1    Mode  :character   Median : -74.0    Median :40.8     Median :1.00   Median :  10  
-     Mean   : 40     Mean   : 1                       Mean   : -72.7    Mean   :40.1     Mean   :1.38   Mean   :  13  
-     3rd Qu.: 41     3rd Qu.: 1                       3rd Qu.: -74.0    3rd Qu.:40.8     3rd Qu.:2.00   3rd Qu.:  14  
-     Max.   :405     Max.   :99                       Max.   : 151.2    Max.   :60.4     Max.   :4.00   Max.   :1000  
-         extra        mta_tax         tip_amount   tolls_amount   improvement_surcharge  total_amount        u        
-     Min.   :-17   Min.   :-1.700   Min.   :-10   Min.   :-11.8   Min.   :-0.300        Min.   :-142   Min.   :0.000  
-     1st Qu.:  0   1st Qu.: 0.500   1st Qu.:  0   1st Qu.:  0.0   1st Qu.: 0.300        1st Qu.:   8   1st Qu.:0.250  
-     Median :  0   Median : 0.500   Median :  1   Median :  0.0   Median : 0.300        Median :  12   Median :0.500  
-     Mean   :  0   Mean   : 0.498   Mean   :  2   Mean   :  0.3   Mean   : 0.297        Mean   :  16   Mean   :0.500  
-     3rd Qu.:  0   3rd Qu.: 0.500   3rd Qu.:  2   3rd Qu.:  0.0   3rd Qu.: 0.300        3rd Qu.:  18   3rd Qu.:0.749  
-     Max.   :900   Max.   : 0.500   Max.   :433   Max.   :120.0   Max.   : 0.300        Max.   :1900   Max.   :1.000  
-
-
 
 What are some important things we can tell about the data by looking at the above summary?
 
@@ -88,7 +60,6 @@ nyc_taxi$store_and_fwd_flag <- NULL
 
 Next we format `tpep_pickup_date` and `tpep_dropoff_date` as datetime columns. There are different functions for dealing with datetime column types, including functions in the `base` package, but we will be using the `lubridate` package for its rich set of functions and simplicity.
 
-
 ```{r 3.03}
 library(lubridate)
 Sys.setenv(TZ = "US/Eastern") # not important for this dataset, but this is how we set the time zone
@@ -101,35 +72,12 @@ The function we need is called `ymd_hms`, but before we run it on the data let's
 ymd_hms("2015-01-25 00:13:08", tz = "US/Eastern") # we can ignore warning message about timezones
 ```
 
-    Warning message:
-    In as.POSIXlt.POSIXct(x, tz): unable to identify current timezone 'C':
-    please set environment variable 'TZ'Warning message:
-    In as.POSIXlt.POSIXct(x, tz): unknown timezone 'localtime'
-
-
-
-
-    [1] "2015-01-25 00:13:08 EST"
-
-
-
 We seem to have the right function and the right set of arguments, so let's now apply it to the data. If we are still unsure about whether things will work, it might be prudent to not immediately overwrite the existing column. We could either write the transformation to a new column or run the transformation on the first few rows of the data and just display the results in the console.
 
 
 ```{r 3.05}
 ymd_hms(nyc_taxi$tpep_pickup_date[1:20], tz = "US/Eastern")
 ```
-
-
-
-
-     [1] "2015-01-15 09:47:05 EST" "2015-01-08 16:24:00 EST" "2015-01-28 21:50:16 EST" "2015-01-28 21:50:18 EST"
-     [5] "2015-01-01 05:29:50 EST" "2015-01-28 10:50:01 EST" "2015-01-23 16:51:38 EST" "2015-01-13 00:09:40 EST"
-     [9] "2015-01-03 09:19:52 EST" "2015-01-23 00:31:02 EST" "2015-01-26 13:33:52 EST" "2015-01-10 23:05:15 EST"
-    [13] "2015-01-15 10:56:47 EST" "2015-01-26 14:07:52 EST" "2015-01-07 19:01:08 EST" "2015-01-05 22:32:05 EST"
-    [17] "2015-01-30 09:08:20 EST" "2015-01-30 09:08:20 EST" "2015-01-27 18:36:07 EST" "2015-01-07 21:41:46 EST"
-
-
 
 We now apply the transformation to the whole data and overwrite the original column with it.
 
@@ -160,53 +108,9 @@ table(week(nyc_taxi$pickup_datetime)) # `week`
 ```
 
 
-
-
-    
-        1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    17    18    19    20 
-    26132 31248 30005 25345 30052 31277 31680 31416 30679 29684 30876 30285 30776 29372 30609 31054 30687 31147 30335 30847 
-       21    22    23    24    25    26 
-    26929 29438 29739 28701 28516 23821 
-
-
-
-
 ```{r 3.10}
 table(week(nyc_taxi$pickup_datetime), month(nyc_taxi$pickup_datetime)) # `week` and `month` are datetime functions
 ```
-
-
-
-
-        
-             1     2     3     4     5     6
-      1  26132     0     0     0     0     0
-      2  31248     0     0     0     0     0
-      3  30005     0     0     0     0     0
-      4  25345     0     0     0     0     0
-      5  14345 15707     0     0     0     0
-      6      0 31277     0     0     0     0
-      7      0 31680     0     0     0     0
-      8      0 31416     0     0     0     0
-      9      0 14430 16249     0     0     0
-      10     0     0 29684     0     0     0
-      11     0     0 30876     0     0     0
-      12     0     0 30285     0     0     0
-      13     0     0 26399  4377     0     0
-      14     0     0     0 29372     0     0
-      15     0     0     0 30609     0     0
-      16     0     0     0 31054     0     0
-      17     0     0     0 30687     0     0
-      18     0     0     0  4478 26669     0
-      19     0     0     0     0 30335     0
-      20     0     0     0     0 30847     0
-      21     0     0     0     0 26929     0
-      22     0     0     0     0 16811 12627
-      23     0     0     0     0     0 29739
-      24     0     0     0     0     0 28701
-      25     0     0     0     0     0 28516
-      26     0     0     0     0     0 23821
-
 
 
 Another benefit of the `datetime` format is that plotting functions can do a better job of displaying the data in the expected format.# (2) many data summaries and data visualizations automatically 'look right' when the data has the proper format. We do not cover data visualization in-depth in this course, but we provide many examples to get you started. Here's a histogram of `pickup_datetime`.
@@ -220,10 +124,12 @@ ggplot(data = nyc_taxi) +
 ```
 
 
+#### 3.11 Sample Output
 ![png](./images/output_167_0.png)
-
+---
 
 Notice how the x-axis is properly formatted as a date without any manual input from us. Both the summary and the plot above would not have been possible if `pickup_datetime` was still a character column.
+
 
 ### Exercise 3.2
 
@@ -234,19 +140,6 @@ Next let's look at the longitude and latitude of the pick-up and drop-off locati
 summary(nyc_taxi[ , grep('long|lat', names(nyc_taxi), value = TRUE)])
 ```
 
-
-
-
-     pickup_longitude pickup_latitude dropoff_longitude dropoff_latitude
-     Min.   :-122.2   Min.   :  0     Min.   :-121.9    Min.   : 0.0    
-     1st Qu.: -74.0   1st Qu.: 41     1st Qu.: -74.0    1st Qu.:40.7    
-     Median : -74.0   Median : 41     Median : -74.0    Median :40.8    
-     Mean   : -72.7   Mean   : 40     Mean   : -72.7    Mean   :40.1    
-     3rd Qu.: -74.0   3rd Qu.: 41     3rd Qu.: -74.0    3rd Qu.:40.8    
-     Max.   :   9.9   Max.   :405     Max.   : 151.2    Max.   :60.4    
-
-
-
 Take a look at the histogram for `pickup_longitude`:
 
 
@@ -255,9 +148,9 @@ ggplot(data = nyc_taxi) +
   geom_histogram(aes(x = pickup_longitude), fill = "blue", bins = 20)
 ```
 
-
+#### r3.13 Sample Output
 ![png](./images/output_173_0.png)
-
+---
 
 We can see that most longitude values fall in the expected range, but there's a second peak around 0. There are also some other values outside of the expected range, but we can't see them in the histogram. We just know there are there because of the wide range (in the x-axis) of the histogram. 
 
@@ -303,6 +196,7 @@ Take a moment to familiarize yourself with both functions by modifying the above
 
 (B) Use `cut` to 'bucket' `pickup_longitude` into the following buckets: -75 or less, between -75 and -73, between -73 and -1, between -1 and 1, more than 1. Then `table` to get counts for each bucket.
 
+
 #### Solution to exercise 3.2
 
 
@@ -311,9 +205,9 @@ ggplot(data = nyc_taxi) +
   geom_histogram(aes(x = pickup_latitude), fill = "blue", bins = 20) # solution to (A)
 ```
 
-
+#### r3.26 Sample Output
 ![png](./images/output_181_0.png)
-
+----
 
 
 ```{r 3.17}
@@ -378,6 +272,7 @@ summary(nyc_taxi[ , grep('long|lat', names(nyc_taxi), value = TRUE)])
 
 
 
+
 ### Exercise 3.3
 
 A useful question we might want to ask is the following: Are longitude and latitude mostly missing as pairs? In other words, is it generally the case that when longitude is missing, so is latitude and vice versa?
@@ -389,29 +284,20 @@ Once missing values are formatted as NAs, we use the `is.na` function to determi
 is.na(c(2, 4, NA, -1, 5, NA))
 ```
 
-
-
-
-<ol class=list-inline>
-  <li>FALSE</li>
-  <li>FALSE</li>
-  <li>TRUE</li>
-  <li>FALSE</li>
-  <li>FALSE</li>
-  <li>TRUE</li>
-</ol>
-
-
-
-
 Combine `is.na` and `table` to answer the following question:
 
 (A) How many of the `pickup_longitude` values are NAs? (This was also answered when we ran `summary`.)
+```{r 3.3 Exercise A}
 
+```
 (B) How many times are `pickup_longitude` and `pickup_latitude` missing together vs separately?
+```{r 3.3 Exercise B}
 
+```
 (C) Of the times when the pair `pickup_longitude` and `pickup_latitude` are missing, how many times is the pair `dropoff_longitude` and `dropoff_latitude` also missing?
+```{r 3.3 Exercise C}
 
+```
 #### Solution to exercise 3.3
 
 
@@ -419,44 +305,13 @@ Combine `is.na` and `table` to answer the following question:
 table(is.na(nyc_taxi$pickup_longitude)) # solution to (A)
 ```
 
-
-
-
-    
-     FALSE   TRUE 
-    757355  13299 
-
-
-
-
 ```{r 3.23}
 table(is.na(nyc_taxi$pickup_longitude) & is.na(nyc_taxi$pickup_latitude)) # solution to (B)
 ```
 
-
-
-
-    
-     FALSE   TRUE 
-    757357  13297 
-
-
-
-
 ```{r 3.24}
 table(is.na(nyc_taxi$pickup_longitude), is.na(nyc_taxi$pickup_latitude)) # better solution to (B)
 ```
-
-
-
-
-           
-             FALSE   TRUE
-      FALSE 757315     40
-      TRUE       2  13297
-
-
-
 
 ```{r 3.25}
 with(nyc_taxi,
@@ -465,19 +320,10 @@ with(nyc_taxi,
 ) # solution to (C)
 ```
 
-
-
-
-           
-             FALSE   TRUE
-      FALSE 755975   1382
-      TRUE    1719  11578
-
-
-
 ---
 
 It's time to turn our attention to the categorical columns in the dataset. Ideally, categorical columns should be turned into `factor` (usually from `character` or `integer`), but let's first get a feel for what a `factor` is by working on the following exercise:
+
 
 ### Exercise 3.4
 
@@ -514,39 +360,9 @@ head(rbg_chr)
 ```
 
 
-
-
-<ol class=list-inline>
-  <li>"green"</li>
-  <li>"blue"</li>
-  <li>"green"</li>
-  <li>"blue"</li>
-  <li>"green"</li>
-  <li>"blue"</li>
-</ol>
-
-
-
-
-
 ```{r 3.30}
 head(rbg_fac)
 ```
-
-
-
-
-<ol class=list-inline>
-  <li>green</li>
-  <li>blue</li>
-  <li>green</li>
-  <li>blue</li>
-  <li>green</li>
-  <li>blue</li>
-</ol>
-
-
-
 
 (B) When we compare the size of each in the memory:
 
@@ -556,37 +372,11 @@ sprintf("Size as characters: %s. Size as factor: %s",
         object.size(rbg_chr), object.size(rbg_fac))
 ```
 
-
-
-
-"Size as characters: 16184. Size as factor: 8624"
-
-
-
 (C) When we ask for counts within each category:
-
 
 ```{r 3.32}
 table(rbg_chr); table(rbg_fac)
 ```
-
-
-
-
-    rbg_chr
-     blue green   red 
-      670   683   647 
-
-
-
-
-
-
-    rbg_fac
-     blue green  pink   red 
-      670   683     0   647 
-
-
 
 (D) when we try to replace an entry with something other than 'red', 'blue' and 'green':
 
@@ -603,19 +393,6 @@ Each category in a categorical column (formatted as `factor`) is called a factor
 levels(rbg_fac)
 ```
 
-
-
-
-<ol class=list-inline>
-  <li>"blue"</li>
-  <li>"green"</li>
-  <li>"pink"</li>
-  <li>"red"</li>
-</ol>
-
-
-
-
 We can relabel the factor levels directly with `levels`:
 
 
@@ -624,87 +401,32 @@ levels(rbg_fac) <- c('Blue', 'Green', 'Pink', 'Red') # we capitalize the first l
 head(rbg_fac)
 ```
 
-
-
-
-<ol class=list-inline>
-  <li>Green</li>
-  <li>Blue</li>
-  <li>NA</li>
-  <li>Blue</li>
-  <li>Green</li>
-  <li>Blue</li>
-</ol>
-
-
-
-
 We can add new factor levels to the existing ones:
-
 
 ```{r 3.36}
 levels(rbg_fac) <- c(levels(rbg_fac), "Yellow") # we add 'Yellow' as a forth factor level
 table(rbg_fac) # even though the data has no 'Yellow' entries, it's an acceptable value
 ```
 
-
-
-
-    rbg_fac
-      Blue  Green   Pink    Red Yellow 
-       670    682      0    647      0 
-
-
-
 Once new factor levels have been created, we can have entries which match the new level:
-
 
 ```{r 3.37}
 rbg_fac[3] <- "Yellow" # does not throw a warning anymore
 table(rbg_fac) # now the data has one 'Yellow' entry
 ```
 
-
-
-
-    rbg_fac
-      Blue  Green   Pink    Red Yellow 
-       670    682      0    647      1 
-
-
-
 Finally, we need to recreate the `factor` column if we want to drop a particular level or change the order of the levels.
-
 
 ```{r 3.38}
 table(rbg_chr) # what we see in the orignal `character` column
 ```
 
-
-
-
-    rbg_chr
-      blue  green    red yellow 
-       670    682    647      1 
-
-
-
 If we don't provide the `factor` with levels (through the `levels` argument), we create a `factor` by scanning the data to find all the levels and sort the levels alphabetically.
-
 
 ```{r 3.39}
 rbg_fac <- factor(rbg_chr)
 table(rbg_fac)
 ```
-
-
-
-
-    rbg_fac
-      blue  green    red yellow 
-       670    682    647      1 
-
-
 
 We can overwrite that by explicitly passing factor levels to the `factor` function, in the order that we wish them to be. There are three important advantages to providing factor levels: 
   1. We can reorder the levels to any order we want (instead of having them alphabetically ordered). This way related levels can appear next to each other in summaries and plots.
@@ -717,150 +439,36 @@ rbg_fac <- factor(rbg_chr, levels = c('red', 'green', 'blue')) # create a `facto
 table(rbg_fac) # notice how 'yellow' has disappeared
 ```
 
-
-
-
-    rbg_fac
-      red green  blue 
-      647   682   670 
-
-
-
-
 ```{r 3.41}
 table(rbg_fac, useNA = "ifany") # 'yellow' was turned into an NA
 ```
 
-
-
-
-    rbg_fac
-      red green  blue  <NA> 
-      647   682   670     1 
-
-
-
 #### Solution to exercise 3.4
 
 
-```{r 3.42}
+```{r 3.4 Solution A}
 # solution to (A)
 head(rbg_chr) # we see quotes
 head(rbg_fac) # we don't see quotes and we see the factor levels at the bottom
 ```
 
-
-
-
-<ol class=list-inline>
-  <li>"green"</li>
-  <li>"blue"</li>
-  <li>"yellow"</li>
-  <li>"blue"</li>
-  <li>"green"</li>
-  <li>"blue"</li>
-</ol>
-
-
-
-
-
-
-
-<ol class=list-inline>
-  <li>green</li>
-  <li>blue</li>
-  <li>NA</li>
-  <li>blue</li>
-  <li>green</li>
-  <li>blue</li>
-</ol>
-
-
-
-
-
-```{r 3.43}
+```{r 3.4 Solution B}
 # solution to (B)
 object.size(rbg_chr)
 object.size(rbg_fac) # takes up less space in memory because factors are stored as integers under the hood
 ```
 
-
-
-
-    16232 bytes
-
-
-
-
-
-
-    8576 bytes
-
-
-
-
-```{r 3.44}
+```{r 3.4 Solution C}
 # solution to (C)
 table(rbg_chr)
 table(rbg_fac) # we can see a count of 0 for 'pink', becuase it's one of the factor levels
 ```
 
-
-
-
-    rbg_chr
-      blue  green    red yellow 
-       670    682    647      1 
-
-
-
-
-
-
-    rbg_fac
-      red green  blue 
-      647   682   670 
-
-
-
-
-```{r 3.45}
+```{r 3.4 Solution C}
 # solution to (D)
 head(rbg_chr) # the 3rd entry changed to 'yellow'
 head(rbg_fac) # we could not change the 3rd entry to 'yellow' because it's not one of the factor levels
 ```
-
-
-
-
-<ol class=list-inline>
-  <li>"green"</li>
-  <li>"blue"</li>
-  <li>"yellow"</li>
-  <li>"blue"</li>
-  <li>"green"</li>
-  <li>"blue"</li>
-</ol>
-
-
-
-
-
-
-
-<ol class=list-inline>
-  <li>green</li>
-  <li>blue</li>
-  <li>NA</li>
-  <li>blue</li>
-  <li>green</li>
-  <li>blue</li>
-</ol>
-
-
-
 
 ---
 
@@ -870,16 +478,6 @@ The goal in the above exercise was to set the context for what factors are. Let'
 ```{r 3.46}
 print(sapply(nyc_taxi, num.distinct))
 ```
-
-                 VendorID       pickup_datetime      dropoff_datetime       passenger_count         trip_distance 
-                        2                748326                748203                     9                  2827 
-         pickup_longitude       pickup_latitude          rate_code_id     dropoff_longitude      dropoff_latitude 
-                    19990                 40148                     7                 27898                 53847 
-             payment_type           fare_amount                 extra               mta_tax            tip_amount 
-                        4                   635                    15                     5                  1972 
-             tolls_amount improvement_surcharge          total_amount 
-                      275                     3                  5384 
-    
 
 Fortunately, the site that hosted the dataset also provides us with a [data dictionary](http://www.nyc.gov/html/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf). Going over the document helps answer what the categorical columns are and what each category represents.
 
@@ -895,23 +493,9 @@ The above information helps us properly label the factor levels.
 
 Notice how `summary` shows us numeric summaries for the categorical columns right now.
 
-
 ```{r 3.47}
 summary(nyc_taxi[ , c('rate_code_id', 'payment_type')]) # shows numeric summaries for both columns
 ```
-
-
-
-
-      rate_code_id  payment_type 
-     Min.   : 1    Min.   :1.00  
-     1st Qu.: 1    1st Qu.:1.00  
-     Median : 1    Median :1.00  
-     Mean   : 1    Mean   :1.38  
-     3rd Qu.: 1    3rd Qu.:2.00  
-     Max.   :99    Max.   :4.00  
-
-
 
 A quick glance at `payment_type` shows two payments as by far the most common. The data dictionary confirms for us that they correspond to card and cash payments.
 
@@ -919,15 +503,6 @@ A quick glance at `payment_type` shows two payments as by far the most common. T
 ```{r 3.48}
 table(nyc_taxi$payment_type)
 ```
-
-
-
-
-    
-         1      2      3      4 
-    483012 284288   2495    859 
-
-
 
 We now turn both `rate_code_id` and `payment_type` into `factor` columns. For `rate_code_id` we keep all the labels, but for `payment_type` we only keep the two most common and label them as 'card' and 'cash'.  We do so by specifying `levels = 1:2` instead of `levels = 1:6` and provide labels for only the first two categories. This means the other values of `payment_type` get lumped together and replaced with NAs, resulting in information loss (which we are comfortable with, for the sake of this analysis).
 
@@ -946,42 +521,9 @@ nyc_taxi <- transform(nyc_taxi,
 head(nyc_taxi[ , c('rate_code_id', 'payment_type')]) # now proper labels are showing in the data
 ```
 
-
-
-
-<table>
-<thead><tr><th></th><th scope=col>rate_code_id</th><th scope=col>payment_type</th></tr></thead>
-<tbody>
-  <tr><th scope=row>1</th><td>standard</td><td>card</td></tr>
-  <tr><th scope=row>2</th><td>standard</td><td>card</td></tr>
-  <tr><th scope=row>3</th><td>standard</td><td>card</td></tr>
-  <tr><th scope=row>4</th><td>standard</td><td>card</td></tr>
-  <tr><th scope=row>5</th><td>Newark</td><td>card</td></tr>
-  <tr><th scope=row>6</th><td>standard</td><td>cash</td></tr>
-</tbody>
-</table>
-
-
-
-
-
 ```{r 3.51}
 summary(nyc_taxi[ , c('rate_code_id', 'payment_type')]) # now counts are showing in the summary
 ```
-
-
-
-
-                    rate_code_id    payment_type 
-     standard             :751356   card:483012  
-     JFK                  : 15291   cash:284288  
-     Newark               :  1244   NA's:  3354  
-     Nassau or Westchester:   284                
-     negotiated           :  2440                
-     group ride           :     9                
-     NA's                 :    30                
-
-
 
 It is very important that the `labels` be in the same order as the `levels` they map into.
 
