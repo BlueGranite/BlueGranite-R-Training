@@ -52,15 +52,6 @@ head(nyc_taxi)
 ```
 
 
-
-
-    Time difference of 15.9 secs
-
-
-
-
-
-
 Reading the data the way we did above means we can now skip some steps, such as factor conversions, but we have still have some work left before we get the data to where it was when we left it in the last section.
 
 Before we do so, let's quickly review the two ways we leared to both query and transform data: We can query and transform data using a direct approach, or we can do so using functions such as `subset` and `transform`. The notation for the latter is cleaner and easier to follow. The two different approaches are shown in the table below. Additionally, we now introduce a third way performing the above two tasks: by using the popular `dplyr` package. `dplyr` has a host of functions for querying, processing, and summarizing data. We learn more about its querying and processing capabilities in this section and the next, and about how to summarize data with `dplyr` in the section about data summaries.
@@ -99,7 +90,6 @@ nyc_taxi <- mutate(nyc_taxi,
 
 For item (3) we have two things to do: firstly, `rate_code_id` is a factor now, but we still need to assign the propor labels it.
 
-
 ```{r 4.03}
 levels(nyc_taxi$rate_code_id) <- c('standard', 'JFK', 'Newark', 'Nassau or Westchester', 'negotiated', 'group ride', 'n/a')
 ```
@@ -112,27 +102,9 @@ table(nyc_taxi$payment_type, useNA = "ifany") # we can see all different payment
 ```
 
 
-
-
-    
-         1      2      3      4 
-    483012 284288   2495    859 
-
-
-
-
 ```{r 4.05}
 nyc_taxi <- mutate(nyc_taxi, payment_type = factor(payment_type, levels = 1:2, labels = c('card', 'cash')))
 table(nyc_taxi$payment_type, useNA = "ifany") # other levels turned into NAs
 ```
-
-
-
-
-    
-      card   cash   <NA> 
-    483012 284288   3354 
-
-
 
 We now have the data to where it was when we left it at the end of the previous section. In the next section, we work on adding new features (columns) to the data.

@@ -28,21 +28,13 @@ Let's begin the data exploration.  Each of the functions below return some usefu
 head(nyc_taxi) # show me the first few rows
 ```
 
-
-
 ```{r 2.02 head 10}
 head(nyc_taxi, n = 10) # show me the first 10 rows
 ```
 
-
-
-
 ```{r 2.03 tail}
 tail(nyc_taxi) # show me the last few rows
 ```
-
-
-
 
 ```{r 2.04 basic info}
 basic_info <- list(
@@ -55,62 +47,18 @@ basic_info <- list(
 print(basic_info)
 ```
 
-    $class
-    [1] "data.frame"
-    
-    $type
-    [1] "list"
-    
-    $nrow
-    [1] 770654
-    
-    $ncol
-    [1] 20
-    
-    $colnames
-     [1] "VendorID"              "tpep_pickup_datetime"  "tpep_dropoff_datetime" "passenger_count"      
-     [5] "trip_distance"         "pickup_longitude"      "pickup_latitude"       "RateCodeID"           
-     [9] "store_and_fwd_flag"    "dropoff_longitude"     "dropoff_latitude"      "payment_type"         
-    [13] "fare_amount"           "extra"                 "mta_tax"               "tip_amount"           
-    [17] "tolls_amount"          "improvement_surcharge" "total_amount"          "u"                    
-    
-    
-
-
 ```{r 2.05 names}
 names(nyc_taxi)[8] <- 'rate_code_id' # rename column `RateCodeID` to `rate_code_id`
 ```
 
 We use `str` to look at column types in the data: the most common column types are `integer`, `numeric` (for floats), `character` (for strings), `factor` (for categorical data).  Less common column types exist, such as date, time, and datetime formats.
 
-
 ```{r 2.06 str}
 str(nyc_taxi)
 ```
 
-    'data.frame':	1388631 obs. of  19 variables:
-    $ vendorid             : int  1 1 1 1 1 1 1 1 1 1 ...
-    $ tpep_pickup_datetime : chr  "2016-01-29 09:29:04" "2016-01-29 09:29:09" "2016-01-29 09:29:34" "2016-01-29 08:11:58" ...
-    $ tpep_dropoff_datetime: chr  "2016-01-29 09:39:46" "2016-01-29 09:37:48" "2016-01-29 09:41:55" "2016-01-29 08:19:25" ...
-    $ passenger_count      : int  1 1 1 1 1 1 1 1 1 1 ...
-    $ trip_distance        : num  1.4 2.6 0.8 1.1 1.4 1.8 1.8 2 5.5 3.3 ...
-    $ pickup_longitude     : num  -74 -74 -74 -74 -74 ...
-    $ pickup_latitude      : num  40.7 40.7 40.7 40.8 40.8 ...
-    $ ratecodeid           : int  1 1 1 1 1 1 1 1 1 1 ...
-    $ store_and_fwd_flag   : chr  "N" "N" "N" "N" ...
-    $ dropoff_longitude    : num  -74 -74 -74 -74 -74 ...
-    $ dropoff_latitude     : num  40.7 40.7 40.7 40.8 40.8 ...
-    $ payment_type         : int  1 1 2 1 1 1 1 2 1 2 ...
-    $ fare_amount          : num  8.5 10.5 8.5 7 12.5 13 7.5 10.5 27 14.5 ...
-    $ extra                : num  0 0 0 0 0 0 0 0 0 0 ...
-    $ mta_tax              : num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...
-    $ improvement_surcharge: num  1 1 0 1.55 1.5 1.2 2.05 0 4 0 ...
-    $ tip_amount           : num  0 0 0 0 0 0 0 0 0 0 ...
-    $ tolls_amount         : num  0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 0.3 ...
-    $ total_amount         : num  10.3 12.3 9.3 9.35 14.8 ...
-    
-
 Now let's see how we can subset or slice the data: in other words.  Since a `data.frame` is a 2-dimensional object, we can slice by asking for specific rows or columns of the data.  The notation we use here (which we refer to as the **bracket notation**) is as follows:
+
 ```
 data[rows_to_slice, columns_to_slice]
 ```
@@ -129,23 +77,13 @@ We will encounter examples for each case.
 nyc_taxi[1:5, 1:4] # rows 1 through 5, columns 1 through 4
 ```
 
-
-
-
 ```{r 2.08 slice 2}
 nyc_taxi[1:5, -(1:4)] # rows 1 through 5, except columns 1 through 4
 ```
 
-
-
-
-
 ```{r 2.09 slice 3}
 nyc_taxi[1:5, ] # all the columns, first 10 rows
 ```
-
-
-
 
 ```{r 2.10 new df}
 nyc.first.ten <- nyc_taxi[1:10, ] # store the results in a new `data.frame` called `nyc.first.ten`
@@ -153,26 +91,17 @@ nyc.first.ten <- nyc_taxi[1:10, ] # store the results in a new `data.frame` call
 
 So far our data slices have been limited to adjacent rows and adjacent columns.  Here's an example of how to slice the data for non-adjacent rows.  It is also far more common to select columns by their names instead of their position (also called numeric index), since this makes the code more readable and won't break the code if column positions change.
 
-
 ```{r 2.11 select}
 nyc_taxi[c(2, 3, 8, 66), c("fare_amount", "mta_tax", "tip_amount", "tolls_amount")]
 ```
-
-
-
-
 
 ### Exercise 2.1
 
 Here is an example of a useful new function: `seq`
 
-
 ```{r 2.12 seq}
 seq(1, 10, by = 2)
 ```
-
-
-
 
 <ol class=list-inline>
   <li>1</li>
@@ -182,70 +111,49 @@ seq(1, 10, by = 2)
   <li>9</li>
 </ol>
 
-
-
-
 (A) Once you figure out what `seq` does, use it to take a sample of the data consisting of every 2500th rows.  Such a sample is called a **systematic sample**.
+```{r 2.1 Exercise A}
+
+```
 
 Here is another example of a useful function: `rep`
-
 
 ```{r 2.13 rep}
 rep(1, 4)
 ```
 
-
-
-
-
 What happens if the first argument to `rep` is a vector?
-
-
 ```{r 2.14 rep 2}
 rep(1:2, 4)
 ```
 
-
-
-
-
 What happens if the second argument to `rep` is also a vector (of the same length)?
-
-
 ```{r 2.15 rep 3}
 rep(c(3, 6), c(2, 5))
 ```
 
 
 (B) Create a new data object consisting of 5 copies of the first row of the data.
+```{r 2.1 Exercise B}
 
+```
 (C) Create a new data object consisting of 5 copies of each of the first 10 rows of the data.
+``` {r 2.1 Exercise c}
+
+```
 
 #### Solution to exercise 2.1
-
-
 ```{r 2.16 Solution A}
 head(nyc_taxi[seq(1, nrow(nyc_taxi), 2500), ]) # solution to (A)
 ```
-
-
-
 
 ```{r 2.17 Solution B}
 nyc_taxi[rep(1, 5), ] # solution to (B)
 ```
 
-
-
 ```{r 2.18 Solution C}
 head(nyc_taxi[rep(1:10, 5), ]) # solution to (C)
 ```
-
-
-
-
-
-
 
 ---
 
@@ -390,36 +298,28 @@ We learned to how to slice data using conditional statements.  Note that in R, n
 subset(nyc_small, fare_amount > 100 & 1:2 > 1)
 ```
 
-
-
-
 See if you can describe what the above statement returns. Of course, just because we can do something in R doesn't mean that we should. Sometimes, we have to sacrifice a little bit of efficiency or conciseness for the sake of clarity.  So reproduce the above subset in a way that makes the code more understandable.  There is more than one way to do this, and you can break up the code in two steps instead of one if you want.
 
 #### Solution to exercise 2.2
-
 
 ```{r 2.32}
 nyc_small <- nyc_small[seq(2, nrow(nyc_small), by = 2), ] # take even-numbered rows
 subset(nyc_small, fare_amount > 100)
 ```
-
-
-
 ---
 
 ### Exercise 2.3
 
 Here's another useful R function: `sample`.  Run the below example multiple times to see the different samples being generated.
 
-
 ```{r 2.33}
 sample(1:10, 5)
 ```
 
-
-
-
 (A) Use `sample` to create random sample consisting of about 10 percent of the data. Store the result in a new data object called `nyc_sample`.
+```{r 2.3 Exercise A}
+
+```
 
 There is another way to do what we just did (that does not involve the `sample` function). We start by creating a column `u` containing random uniform numbers between 0 and 1, which we can generate with the `runif` function.
 
@@ -429,24 +329,31 @@ nyc_taxi$u <- runif(nrow(nyc_taxi))
 ```
 
 (B) Recreate the same sample we had in part (A) but use the column `u` instead.
+```{r 2.3 Exercise B}
+
+```
+
 
 (C) You would probably argue that the second solution is easier. There is however an advantage to using the `sample` function: we can also do sampling **with replacement** with the `sample` function. First find the argument that allows sampling with replacement. Then use it to take a sample of size 1000 *with replacement* from the `nyc_taxi` data.
+```{r 2.3 Exercise B}
+
+```
 
 #### Solution to exercise 2.3
 
 
-```{r 2.35}
+```{r 2.3 Solution A}
 nyc_sample <- nyc_taxi[sample(1:nrow(nyc_taxi), nrow(nyc_taxi)/10) , ] # solution to (A)
 ```
 
 
-```{r 2.36}
+```{r 2.3 Solution B}
 nyc_sample <- subset(nyc_taxi, u < .1) # solution to (B)
 nyc_sample$u <- NULL # we can drop `u` now, since it is no longer needed
 ```
 
 
-```{r 2.37}
+```{r 2.3 Solution C}
 nyc_sample <- nyc_taxi[sample(1:nrow(nyc_taxi), 1000, replace = TRUE) , ] # solution to (C)
 ```
 
@@ -482,23 +389,9 @@ num.distinct(c(5, 6, 6, 9))
 ```
 
 
-
-
-3
-
-
-
-
 ```{r 2.40}
 num.distinct(1) # test the function on a singleton (a vector of length 1)
 ```
-
-
-
-
-1
-
-
 
 
 ```{r 2.41}
@@ -506,23 +399,9 @@ num.distinct(c()) # test the function on an empty vector
 ```
 
 
-
-
-0
-
-
-
-
 ```{r 2.42}
 num.distinct(c(23, 45, 45, NA, 11, 11)) # test the function on a vector with NAs
 ```
-
-
-
-
-4
-
-
 
 Now we can test the function on the data, for example on `pickup_longitude`:
 
@@ -532,28 +411,12 @@ num.distinct(nyc_taxi$pickup_longitude) # check it on a single variable in our d
 ```
 
 
-
-
-22663
-
-
-
 But what if we wanted to run the function on all the columns in the data at once? We could write a loop, but instead we show you the `sapply` function, which accomplishes the same thing in a more succint and R-like manner. With `sapply`, we pass the data as the first argument, and some function (usually a summary function) as the second argument: `sapply` will run the function on each column of the data (or those columns of the data for which the summary function is relevant).
 
 
 ```{r 2.44}
 print(sapply(nyc_taxi, num.distinct)) # apply it to each variable in the data
 ```
-
-                 VendorID  tpep_pickup_datetime tpep_dropoff_datetime       passenger_count         trip_distance 
-                        2                748329                748205                     9                  2827 
-         pickup_longitude       pickup_latitude          rate_code_id    store_and_fwd_flag     dropoff_longitude 
-                    20001                 40197                     7                     2                 27913 
-         dropoff_latitude          payment_type           fare_amount                 extra               mta_tax 
-                    53989                     4                   635                    15                     5 
-               tip_amount          tolls_amount improvement_surcharge          total_amount                     u 
-                     1972                   275                     3                  5384                770600 
-    
 
 Any secondary argument to the summary function can be passed along to `sapply`. This feature makes `sapply` (and other similar functions) very powerful. For example, the `mean` function has an argument called `na.rm` for removing missing values. By default, `na.rm` is set to `FALSE` and unless `na.rm = TRUE` the function will return `NA` if there is any missing value in the data.
 
@@ -562,30 +425,11 @@ Any secondary argument to the summary function can be passed along to `sapply`. 
 print(sapply(nyc_taxi, mean)) # returns the average of all columns in the data
 ```
 
-                 VendorID  tpep_pickup_datetime tpep_dropoff_datetime       passenger_count         trip_distance 
-                    1.522                    NA                    NA                 1.679                26.796 
-         pickup_longitude       pickup_latitude          rate_code_id    store_and_fwd_flag     dropoff_longitude 
-                  -72.699                40.049                 1.041                    NA               -72.730 
-         dropoff_latitude          payment_type           fare_amount                 extra               mta_tax 
-                   40.067                 1.379                12.703                 0.315                 0.498 
-               tip_amount          tolls_amount improvement_surcharge          total_amount                     u 
-                    1.679                 0.289                 0.297                15.785                 0.500 
-    
-
 
 ```{r 2.46}
 print(sapply(nyc_taxi, mean, na.rm = TRUE)) # returns the average of all columns in the data after removing NAs
 ```
 
-                 VendorID  tpep_pickup_datetime tpep_dropoff_datetime       passenger_count         trip_distance 
-                    1.522                    NA                    NA                 1.679                26.796 
-         pickup_longitude       pickup_latitude          rate_code_id    store_and_fwd_flag     dropoff_longitude 
-                  -72.699                40.049                 1.041                    NA               -72.730 
-         dropoff_latitude          payment_type           fare_amount                 extra               mta_tax 
-                   40.067                 1.379                12.703                 0.315                 0.498 
-               tip_amount          tolls_amount improvement_surcharge          total_amount                     u 
-                    1.679                 0.289                 0.297                15.785                 0.500 
-    
 
 ### Exercise 2.4
 
@@ -596,35 +440,17 @@ Let's return to the `num.distinct` function we created earlier. The comment insi
 unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4)) # what happened?
 ```
 
-
-
 Generally, to check for equality between two numeric value (or two numeric columns), we need to be more careful.
-
 
 ```{r 2.48}
 .3 == .4 - .1 # returns unexpected result
 ```
 
-
-
-
-FALSE
-
-
-
 The right way to check if two real numbers are equal is to see if their difference is below a certain threshold.
-
 
 ```{r 2.49}
 abs(.3 - (.4 - .1)) < .0000001 # the right way of doing it
 ```
-
-
-
-
-TRUE
-
-
 
 Another more convenient way to check equality between two real numbers is by using the `all.equal` function.
 
@@ -634,20 +460,20 @@ all.equal(.3, .4 - .1) # another way of doing it
 ```
 
 
-
-
-TRUE
-
-
-
 (A) Use `all.equal` to determine if `total_amount` is equal to the sum of `fare_amount`, `extra`, `mta_tax`, `tip_amount`, `tolls_amount`, and `improvement_surcharge`.
+```{r 2.4 Exercise A}
+
+```
+
 
 (B) What are some other ways we could check (not necessarily exact) equality between two numeric variables?
+```{r 2.4 Exercise B}
+
+```
 
 #### Solution to exercise 2.4
 
-
-```{r 2.51}
+```{r 2.4 Solution A}
 with(nyc_taxi,
      all.equal(total_amount, 
                fare_amount + extra + mta_tax + tip_amount + tolls_amount + improvement_surcharge)
@@ -655,25 +481,11 @@ with(nyc_taxi,
 ```
 
 
-
-
-"Mean relative difference: 0.00119"
-
-
-
-
-```{r 2.52}
+```{r 2.4 Solution B}
 with(nyc_taxi,
      cor(total_amount, # we could use correlation instead of `all.equal`
          fare_amount + extra + mta_tax + tip_amount + tolls_amount + improvement_surcharge)
 ) # solution to (B)
 ```
-
-
-
-
-0.998425910462277
-
-
 
 ---
