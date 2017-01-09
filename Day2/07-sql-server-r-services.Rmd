@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
 ```
 
 ```{r 7.01 - packages}
@@ -32,7 +33,7 @@ library(RevoScaleR)
 ```{r 7.02 - connection string}
 # Define the connection string
 # This walkthrough requires SQL authentication
-connStr <- "Driver=SQL Server;Server=localhost;Database=nyctaxi;Trusted_Connection=Yes"
+connStr <- "Driver=SQL Server;Server=localhost;Database=nyctaxi;uid=train;pwd=mrsTr@ining;"
 ```
 
 ```{r 7.03 - compute context}
