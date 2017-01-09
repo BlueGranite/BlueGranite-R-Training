@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
 ```
 
 ## Spatial patterns
@@ -29,9 +30,6 @@ res[which(is.nan(res))] <- mean(res, na.rm = TRUE)
 nb_order <- seriate(res)
 ```
 
-    Rows Processed: 31998015 
-    
-
 We will use `nb_order` in a little while, but before we do so, let's use `rxCube` to get counts and averages for `trip_distance`, a new data point representing minutes spent in the taxi per mile of the trip, and `tip_percent`.  In the above example, we used `rxCrossTabs` because we wanted a matrix as the return object, so we could feed it to `seriate`.  We now use `rxCube` to get a `data.frame` instead, since we intend to use it for plotting with `ggplot2`, which is more easier to code using a long `data.frame` as input compared to a wide `matirx`.
 
 
@@ -45,16 +43,7 @@ res <- res[ , c('pickup_nb', 'dropoff_nb', 'trip_distance', 'minutes_per_mile', 
 head(res)
 ```
 
-    Rows Processed: 31998015 
-    Rows Processed: 31998015 
-    Rows Processed: 31998015 
-    
-
-
-
-
 We can start plotting the above results to see some interesting trends.
-
 
 ```{r 5.03}
 library(ggplot2)
@@ -123,11 +112,6 @@ rxDataStep(inData = mht_xdf, outFile = mht_xdf,
            overwrite = TRUE)
 ```
 
-    Rows Processed: 31998015 
-    
-
-
-
 ```{r 5.07}
 # second way of reordering the factor levels
 rxFactors(mht_xdf, outFile = mht_xdf, factorInfo = list(pickup_nb = list(newLevels = unique(newlevs)), 
@@ -135,8 +119,6 @@ rxFactors(mht_xdf, outFile = mht_xdf, factorInfo = list(pickup_nb = list(newLeve
          overwrite = TRUE)
 ```
 
-    Rows Processed: 31998015 
-    
 
 ### Fare amount and tipping behavior
 
@@ -190,14 +172,6 @@ rxc %>%
 head(rxcs)
 ```
 
-    Rows Processed: 31998015 
-    
-
-
-
-
-
-
 Based on the first row, we can see that trips from the Upper East Side to the Upper East Side make up about 5% of all trips in Manhattan.  Of all the trips that pick up in the Upper East Side, about 36% drop off in the Upper East Side.  Of all the trips that drop off in the Upper East Side, 37% and tripped that also picked up in the Upper East Side.
 
 We can take the above numbers and display them in plots that make it easier to digest it all at once.  We begin with a plot showing how taxi trips between any pair of neighborhoods are distributed.
@@ -210,7 +184,6 @@ ggplot(rxcs, aes(pickup_nb, dropoff_nb)) +
   scale_fill_gradient(low = "white", high = "black") + 
   coord_fixed(ratio = .9)
 ```
-
 
 ![png](./images/output_92_0.png)
 
@@ -272,11 +245,6 @@ ggplot(res, aes(pickup_dow, pickup_hour)) +
   geom_text(aes(label = sprintf('%dK riders\n (%d%% tip)', signif(Counts/1000, 2), round(tip_percent, 0))), size = 2.5) + 
   coord_fixed(ratio = .9)
 ```
-
-    Rows Processed: 31998015 
-    Rows Processed: 31998015 
-    
-
 
 ![png](./images/output_104_1.png)
 

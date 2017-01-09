@@ -40,11 +40,6 @@ nyc_sample_df <- read.csv(input_csv, nrows = 1000, colClasses = col_classes)
 head(nyc_sample_df)
 ```
 
-
-
-
-
-
 Our first task is to read the data using MRS. MRS has two ways of dealing with flat files: (1) it can work directly with the flat files, meaning that it reads and writes to flat files directly, (2) it can covert flat files to a format called XDF (XDF stands for external data frame).  An XDF file is much smaller than a CSV file because it is compressed.  Its main advantage over a CSV file is that an XDF file can be read and processed much faster than a CSV file (we will run some benchmarks to see how much faster).  The disadvantage of an XDF file format is a format that only MRS understands and can work with.  So in order to decide whether we chose XDF or CSV we need to understand the tradeoffs involved:
 
 1. Converting from CSV to XDF is itself a cost in terms of runtime.
@@ -67,16 +62,3 @@ for(ii in 2:3) { # get each month's data and append it to the first month's data
 }
 Sys.time() - st # stores the time it took to import
 ```
-
-    Rows Processed: 12748986 
-    Rows Processed: 12450521 
-    [1] "yellow_tripdata_2015-02.csv"
-    Rows Processed: 13351609 
-    [1] "yellow_tripdata_2015-03.csv"
-    
-
-
-
-
-    Time difference of 8.938163 mins
-

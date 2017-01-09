@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
 ```
 
 
@@ -17,25 +18,6 @@ nyc_xdf <- RxXdfData(input_xdf)
 rxSummary( ~ fare_amount, nyc_xdf) # provide statistical summaries for fare amount
 ```
 
-    Rows Processed: 38551116 
-    
-
-
-
-
-    Call:
-    rxSummary(formula = ~fare_amount, data = nyc_xdf)
-    
-    Summary Statistics Results for: ~fare_amount
-    Data: nyc_xdf (RxXdfData Data Source)
-    File name: yellow_tripdata_2015.xdf
-    Number of valid observations: 38551116 
-     
-     Name        Mean     StdDev   Min  Max      ValidObs MissingObs
-     fare_amount 12.32933 101.0839 -496 503325.5 38551116 0         
-
-
-
 Note that we could have done the same analysis with the original CSV file and skipped XDF coversion. Since we have a separate CSV file for each month, unless we combine the CSV files, we can only get the summary for one month's data.  For our purposes that will be enough.  To run `rxSummary` on the CSV file, we simply create a pointer to the CSV file using `RxTextData` (instead of `RxXdfData` as was the case above) and pass the column types directly to it.  The rest is the same.  Notice how running the summary on the CSV file takes considerably longer (even though the CSV file comprises only one month's data).
 
 
@@ -44,25 +26,6 @@ nyc_csv <- RxTextData(input_csv, colClasses = col_classes) # point to CSV file a
 rxSummary( ~ fare_amount, nyc_csv) # provide statistical summaries for fare amount
 ```
 
-    Rows Processed: 13351609 
-    
-
-
-
-
-    Call:
-    rxSummary(formula = ~fare_amount, data = nyc_csv)
-    
-    Summary Statistics Results for: ~fare_amount
-    Data: nyc_csv (RxTextData Data Source)
-    File name: yellow_tripdata_2015-03.csv
-    Number of valid observations: 13351609 
-     
-     Name        Mean     StdDev   Min  Max      ValidObs MissingObs
-     fare_amount 12.70864 144.3045 -270 503325.5 13351609 0         
-
-
-
 The last example was run to demonstrate `RevoScaleR`'s capabilty to work directly with flat files (even though they take longer than XDF files), but since our analysis involves lots of data processing and running various analytics functions, from now on we work with the XDF file, so we can benefit from faster runtime.
 
 
@@ -70,44 +33,6 @@ The last example was run to demonstrate `RevoScaleR`'s capabilty to work directl
 rxGetInfo(nyc_xdf, getVarInfo = TRUE) # show column types and the first 10 rows
 ```
 
-
-
-
-    File name: C:\Data\NYC_taxi\yellow_tripdata_2015.xdf 
-    Number of observations: 38551116 
-    Number of variables: 19 
-    Number of blocks: 78 
-    Compression type: zlib 
-    Variable information: 
-    Var 1: VendorID
-           2 factor levels: 2 1
-    Var 2: tpep_pickup_datetime, Type: character
-    Var 3: tpep_dropoff_datetime, Type: character
-    Var 4: passenger_count, Type: integer, Low/High: (0, 9)
-    Var 5: trip_distance, Type: numeric, Low/High: (-40840124.4000, 15420061.0000)
-    Var 6: pickup_longitude, Type: numeric, Low/High: (-736.2667, 78.6627)
-    Var 7: pickup_latitude, Type: numeric, Low/High: (-27.7777, 404.8667)
-    Var 8: RateCodeID
-           7 factor levels: 1 2 5 3 4 99 6
-    Var 9: store_and_fwd_flag
-           2 factor levels: N Y
-    Var 10: dropoff_longitude, Type: numeric, Low/High: (-781.7167, 85.2740)
-    Var 11: dropoff_latitude, Type: numeric, Low/High: (-27.7777, 474.2000)
-    Var 12: payment_type
-           5 factor levels: 1 2 3 4 5
-    Var 13: fare_amount, Type: numeric, Low/High: (-496.0000, 503325.5300)
-    Var 14: extra, Type: numeric, Low/High: (-79.0000, 999.9900)
-    Var 15: mta_tax, Type: numeric, Low/High: (-2.7000, 80.8000)
-    Var 16: tip_amount, Type: numeric, Low/High: (-118.0000, 3950588.8000)
-    Var 17: tolls_amount, Type: numeric, Low/High: (-70.0000, 1450.0900)
-    Var 18: improvement_surcharge, Type: numeric, Low/High: (-0.3000, 0.3000)
-    Var 19: total_amount, Type: numeric, Low/High: (-496.3000, 3950611.6000)
-
-
-
-
 ```{r 2.04}
 head(nyc_xdf)
 ```
-
-

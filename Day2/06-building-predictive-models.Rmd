@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
 ```
 
 ## Predicting tip amount
@@ -17,10 +18,6 @@ rxlm <- rxLinMod(tip_percent ~ pickup_nb:dropoff_nb + pickup_dow:pickup_hour, da
 rxs <- rxSummary( ~ pickup_nb + dropoff_nb + pickup_hour + pickup_dow, mht_xdf)
 ```
 
-    Rows Processed: 31998015 
-    Rows Processed: 31998015 
-    
-
 Examining the model coefficients individually is a daunting task because of how many there are. Moreover, when working with big datasets, a lot of coefficients come out as statistically significant by virtue of large sample size, without necessarily being practically significant. Instead for now we just look at how our predictions are looking. We start by extracting each variable's factor levels into a `list` which we can pass to `expand.grid` to create a dataset with all the possible combinations of the factor levels. We then use `rxPredict` to predict `tip_percent` using the above model.
 
 
@@ -31,14 +28,6 @@ pred_df <- expand.grid(ll)
 pred_df <- rxPredict(rxlm, data = pred_df, computeStdErrors = TRUE, writeModelVars = TRUE)
 head(pred_df, 10)
 ```
-
-    Rows Processed: 38416 
-    
-
-
-
-
-
 
 We can now visualize the model's predictions by plotting the average predictions for all combinations of the interactive terms.
 
@@ -84,15 +73,6 @@ pred_df <- pred_df_simple %>%
 
 head(pred_df)
 ```
-
-    Rows Processed: 31998015 
-    Rows Processed: 38416 
-    
-
-
-
-
-
 
 We can see from the results above that the predictions with the simpler model are identical across all the days of the week and all the hours for the same pick-up and drop-off combination.  Whereas the predictions by the more complex model are unique for every combination of all four variables.  In other words, adding `pickup_dow:pickup_hour` to the model adds extra variation to the predictions, and what we'd like to know is if this variation contains important signals or if it more or less bahaves like noise. To get to the answer, we compare the distribution of the two predictions when we break them up by `pickup_dow` and `pickup_hour`.
 
@@ -145,10 +125,6 @@ mht_split <- rx_split_xdf(xdf = mht_xdf, varsToKeep = c('payment_type', 'fare_am
 names(mht_split) <- c("train", "test")
 ```
 
-    Rows Processed: 31998015 
-    Rows Processed: 31998015 
-    
-
 We now run three different algorithms on the data:
 
   - `rxLinMod`, the linear model from earlier with the terms `tip_percent ~ pickup_nb:dropoff_nb + pickup_dow:pickup_hour`
@@ -167,32 +143,7 @@ system.time(dforest <- rxDForest(tip_percent ~ pickup_nb + dropoff_nb + pickup_d
                                  mht_split$train, nTree = 10, importance = TRUE, useSparseCube = TRUE, reportProgress = 0))
 ```
 
-
-
-
-       user  system elapsed 
-       0.01    0.00    1.26 
-
-
-
-
-
-
-       user  system elapsed 
-       0.03    0.05  664.23 
-
-
-
-
-
-
-       user  system elapsed 
-       0.00    0.02  538.96 
-
-
-
 Since running the above algorithms can take a while, it may be worth saving the models that each return.
-
 
 ```{r 6.09}
 trained.models <- list(linmod = linmod, dtree = dtree, dforest = dforest)
@@ -218,15 +169,6 @@ ggplot(data = pred_df) +
   geom_density(aes(x = tip_percent_pred_dforest, col = "dforest")) # + facet_grid(pickup_hour ~ pickup_dow)
 ```
 
-    Rows Processed: 38416 
-    Rows Processed: 38416 
-    Rows Processed: 38416 
-    
-
-
-
-
-
 ![png](./images/output_126_2.png)
 
 
@@ -246,33 +188,6 @@ rxSummary(~ SSE_linmod + SSE_dtree + SSE_dforest, data = mht_split$test,
                             SSE_dforest = (tip_percent - tip_percent_pred_dforest)^2))
 ```
 
-    Rows Processed: 24003751 
-    Rows Processed: 24003751 
-    Rows Processed: 24003751 
-    Rows Processed: 24003751 
-    
-
-
-
-
-    Call:
-    rxSummary(formula = ~SSE_linmod + SSE_dtree + SSE_dforest, data = mht_split$test, 
-        transforms = list(SSE_linmod = (tip_percent - tip_percent_pred_linmod)^2, 
-            SSE_dtree = (tip_percent - tip_percent_pred_dtree)^2, 
-            SSE_dforest = (tip_percent - tip_percent_pred_dforest)^2))
-    
-    Summary Statistics Results for: ~SSE_linmod + SSE_dtree + SSE_dforest
-    Data: mht_split$test (RxXdfData Data Source)
-    File name: C:\Data\NYC_taxi\output\split\train.split.train.xdf
-    Number of valid observations: 24003751 
-     
-     Name        Mean     StdDev   Min                    Max      ValidObs MissingObs
-     SSE_linmod  82.97691 109.4821 0.00000000000248315989 8786.950 24003751 0         
-     SSE_dtree   82.73915 109.5350 0.00000587611335319103 8898.893 24003751 0         
-     SSE_dforest 82.83703 108.1598 0.00000000000003121173 8643.967 24003751 0         
-
-
-
 All models did surprisingly well. This could be an indication that we still have a lot of left-over signal to capture, i.e. the model is **underfitting**. This makes sense, given that there are still a lot of important columns in the data that we left out of the models, such as `payment_type` which has a strong influence on `tip_percent`. We can use RMSE (the square root of the numbers under the `Mean` column above) to compare the models with each other, we don't know how well they do predicting in the first place. So let's also look at the correlation between `tip_percent` and each of the models' predictions.
 
 
@@ -280,14 +195,6 @@ All models did surprisingly well. This could be an indication that we still have
 rxc <- rxCor( ~ tip_percent + tip_percent_pred_linmod + tip_percent_pred_dtree + tip_percent_pred_dforest, data = mht_split$test)
 print(rxc)
 ```
-
-    Rows Processed: 24003751 
-                             tip_percent tip_percent_pred_linmod tip_percent_pred_dtree tip_percent_pred_dforest
-    tip_percent                1.0000000               0.1402579              0.1499408                0.1494418
-    tip_percent_pred_linmod    0.1402579               1.0000000              0.8645227                0.9089591
-    tip_percent_pred_dtree     0.1499408               0.8645227              1.0000000                0.9321950
-    tip_percent_pred_dforest   0.1494418               0.9089591              0.9321950                1.0000000
-    
 
 The correlation numbers are somewhat disappointing: as we can see the predictions from our model are not as well as expected. There can be different reasons our predictions are not very accurate, some apply across the board (such as having data that hasn't been properly cleaned, or leaving out important variables), and others are model-specific (for example, linear models can be sensetive to outliers while tree-based models are not). We examine such assumptions more thoroughly in our modeling course, as well as ways that we can improve our models, in another course.
 

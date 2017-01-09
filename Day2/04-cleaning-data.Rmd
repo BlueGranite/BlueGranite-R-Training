@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
 ```
 
 ### Cleaning the data
@@ -22,12 +23,7 @@ Now that we have the data with candidate outliers, we can examine it for certain
 rxHistogram( ~ trip_distance, nyc_xdf, startVal = 0, endVal = 25, histType = "Percent", numBreaks = 20)
 ```
 
-    Rows Processed: 38551116 
-    
-
-
 ![png](./images/output_49_1.png)
-
 
 There is a second peak around around trips that traveled between 16 and 20, which is worth examining further.  We can verify this by looking at which neighborhoods passengers are traveling from and to.
 
@@ -36,12 +32,6 @@ There is a second peak around around trips that traveled between 16 and 20, whic
 rxs <- rxSummary( ~ pickup_nhood:dropoff_nhood, nyc_xdf, rowSelection = (trip_distance > 15 & trip_distance < 22))
 head(arrange(rxs$categorical[[1]], desc(Counts)), 10)
 ```
-
-    Rows Processed: 38551116 
-    
-
-
-
 
 
 As we can see, `Gravesend-Sheepshead Bay` often appears as a destination, and surprisingly, not as a pickup point.  We can also see trips from and to `Jamaica`, which is the neighborhood closest to the JFK airport. 
@@ -63,9 +53,6 @@ odd_trips <- rxDataStep(nyc_xdf, rowSelection = (
 print(dim(odd_trips))
 ```
 
-    Rows Processed: 38551116 
-    [1] 82192    32
-    
 
 Since the dataset with the candidate outliers is a `data.frame`, we can use any R function to examine it.  For example, we limit `odd_trips` to cases where a distance of more than 50 miles was traveled, plot a histogram of the fare amount the passenger paid, and color it based on wether the trip took more or less than 10 minutes.
 
@@ -113,9 +100,6 @@ rxDataStep(nyc_xdf, mht_xdf,
            overwrite = TRUE)
 ```
 
-    Rows Processed: 38551116 
-    
-
 And since we limited the scope of the data, it might be a good idea to create a sample of the new data (as a `data.frame`).  Our last sample, `nyc_sample_df` was not a good sample, since we only took the top 1000 rows of the data.  This time, we use `rxDataStep` to create a random sample of the data, containing only 1 percent of the rows from the larger dataset.
 
 
@@ -125,13 +109,6 @@ mht_sample_df <- rxDataStep(mht_xdf, rowSelection = (u < .01),
 
 dim(mht_sample_df)
 ```
-
-    Rows Processed: 31998015 
-    WARNING: The number of rows (321084) times the number of columns (24)
-    exceeds the 'maxRowsByCols' argument (3000000). Rows will be truncated.
-    
-
-
 
 
 We could use **k-means clustering** to cluster the data based on longitude and latitude, which we would have to rescale so they have the same influence on the clusters (a simple way to rescale them is to divide longitude by -74 and latitude by 40).  Once we have the clusters, we can plot the cluster **centroids** on the map instead of the individual data points that comprise each cluster.
@@ -149,13 +126,3 @@ centroids_sample <- rxkm_sample$centers %>%
 
 head(centroids_sample)
 ```
-
-
-
-
-    Time difference of 1.767771 secs
-
-
-
-
-
