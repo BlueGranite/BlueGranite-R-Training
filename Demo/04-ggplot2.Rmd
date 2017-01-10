@@ -1,0 +1,73 @@
+---
+title: "ggplot2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+dim(mtcars)
+head(mtcars)
+```
+
+##ggplot2 relies on the "grammar of graphics" and has the following typical syntax
+ggplot(data = <DATA>) + 
+    <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+
+```{r}
+#plot in base R shows a visualization
+plot(head(mtcars))
+```
+
+```{r}
+#comparable plot in ggplot2 is blank
+ggplot(mtcars)
+```
+
+```{r}
+#instead requires geometry
+ggplot(mtcars) +
+  geom_point(aes(mpg, wt))
+```
+
+```{r}
+#add model 
+ggplot(mtcars, aes(mpg, wt)) + stat_smooth()
+```
+
+```{r}
+#add linear model
+ggplot(mtcars, aes(mpg, wt)) + stat_smooth(method="lm")
+```
+
+```{r}
+#overlay points
+ggplot(mtcars, aes(mpg, wt)) + 
+  stat_smooth() +
+  geom_point(aes(mpg, wt))
+  
+```
+
+```{r}
+#add some color
+ggplot(mtcars, aes(y=wt, x=mpg, colour=factor(cyl))) +
+  stat_smooth(method=lm) + geom_point()
+```
+
+```{r}
+#lets get more complicated
+ggplot(mtcars, aes(x=cyl, y=gear)) +
+	geom_tile(aes(fill=scale(mpg)), colour="white") +
+	scale_fill_gradient(low="white", high="steelblue") +
+	xlab(mtcars["cyl"]) + 
+	ylab(mtcars[2]) +
+	theme_bw() +
+	theme(panel.grid=element_blank()) +
+	theme(panel.border=element_blank()) +
+	theme(axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold")) +
+	theme(legend.position="none") + 
+  ggtitle("Four cylinder cars have highest MPG in 5th gear")
+```
