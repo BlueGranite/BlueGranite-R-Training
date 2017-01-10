@@ -1,0 +1,111 @@
+---
+title: "dplyr"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("nycflights13")
+library(nycflights13)
+dim(flights)
+head(flights)
+```
+
+
+##Filter rows with filter()
+
+filter() allows you to select a subset of rows in a data frame. The first argument is the name of the data frame. The second and subsequent arguments are the expressions that filter the data frame:
+For example, we can select all flights on January 1st with:
+
+```{r}
+filter(flights, month == 1, day == 1)
+```
+
+This is equivalent to the more verbose code in base R:
+
+```{r}
+flights[flights$month == 1 & flights$day == 1, ]
+```
+
+filter() works similarly to subset() except that you can give it any number of filtering conditions, which are joined together with & (not && which is easy to do accidentally!). You can also use other boolean operators:
+
+```{r}
+filter(flights, month == 1 | month == 2)
+```
+
+To select rows by position, use slice():
+
+```{r}
+slice(flights, 1:10)
+```
+
+
+##Arrange rows with arrange()
+
+arrange() works similarly to filter() except that instead of filtering or selecting rows, it reorders them. It takes a data frame, and a set of column names (or more complicated expressions) to order by. If you provide more than one column name, each additional column will be used to break ties in the values of preceding columns:
+
+```{r}
+arrange(flights, year, month, day)
+```
+
+Use desc() to order a column in descending order:
+
+```{r}
+arrange(flights, desc(arr_delay))
+```
+
+
+##Select columns with select()
+
+Often you work with large datasets with many columns but only a few are actually of interest to you. select() allows you to rapidly zoom in on a useful subset using operations that usually only work on numeric variable positions:
+
+```{r}
+# Select columns by name
+select(flights, year, month, day)
+```
+
+```{r}
+# Select all columns between year and day (inclusive)
+select(flights, year:day)
+```
+
+```{r}
+# Select all columns except those from year to day (inclusive)
+select(flights, -(year:day))
+```
+
+
+##Extract distinct (unique) rows
+
+Use distinct()to find unique values in a table:
+
+```{r}
+distinct(flights, tailnum)
+```
+
+
+##Add new columns with mutate()
+
+Besides selecting sets of existing columns, it’s often useful to add new columns that are functions of existing columns. This is the job of mutate():
+
+```{r}
+mutate(flights, gain = arr_delay - dep_delay, speed = distance / air_time * 60)
+```
+
+If you only want to keep the new variables, use transmute():
+```{r}
+transmute(flights, gain = arr_delay - dep_delay, gain_per_hour = gain / (air_time / 60)
+)
+```
+
+
+##Summarize values with summarise()
+
+The last verb is summarise(). It collapses a data frame to a single row:
+
+```{r}
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+```
