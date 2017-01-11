@@ -1,0 +1,62 @@
+---
+title: "sqldf"
+author: "David Eldersveld, BlueGranite"
+date: "January 10, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##sqldf package will run SQL SELECT statements against R data frames
+https://cran.r-project.org/web/packages/sqldf/sqldf.pdf
+
+```{r}
+install.packages("sqldf")
+```
+
+```{r}
+library(sqldf)
+data("singer")
+```
+
+```{r}
+sqldf("SELECT * FROM singer LIMIT 10")
+```
+
+```{r}
+sqldf("SELECT AVG(height) AS avg_height FROM singer")
+```
+
+```{r}
+#colnames with a period don't work, and you will receive an error
+sqldf("SELECT voice.part FROM singer")
+```
+
+```{r}
+#rename column with period by substituting an underscore, then run SQL statement
+colnames(singer) <- gsub("\\.","_",colnames(singer))
+sqldf("SELECT voice_part, 
+          AVG(height) AS height 
+      FROM singer 
+      GROUP BY voice_part")
+```
+
+```{r}
+sqldf("SELECT voice_part, 
+          MAX(height) AS height 
+      FROM singer 
+      WHERE voice_part LIKE 'Bass%'
+      GROUP BY voice_part")
+```
+
+```{r}
+#assign results to a new data frame
+tallest.basses <- sqldf("SELECT voice_part, 
+                            MAX(height) AS height 
+                        FROM singer 
+                        WHERE voice_part LIKE 'Bass%'
+                        GROUP BY voice_part")
+print(tallest.basses)
+```
