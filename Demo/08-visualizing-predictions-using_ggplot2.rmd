@@ -1,0 +1,214 @@
+---
+title: "Visualizing Data with ggplot2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Data/NYC_taxi")
+```
+
+## Section 1: Loading data into R
+
+The process of loading data into R changes based on the kind of data. The standard format for data is tabular.  A CSV file is an example of tabular data.  Assuming that our CSV file is "clean", we should be able to read the file using the `read.csv` function.  Here are examples of what we mean by "clean" data for a CSV file:
+
+  - column headers are at the top
+  - rows all have an equal number of cells, with two adjacent commas representing an empty cell
+  - file only contains the data, with all other metadata stored in a separate file referred to as the **data dictionary**
+
+We use the `readLines` function in R to print the first few lines of the data.  This can serve as a starting point for examining the data.
+
+
+```{r 1.01 file preview}
+#setwd('C:/Data/NYC_taxi')
+
+data_path <- 'C:\\Data\\NYC_Taxi\\NYC_Sample.csv'
+print(readLines(file(data_path), n = 3)) # print the first 3 lines of the file
+```
+                                                                                      Before we run `read.csv` to load the data into R, let's inspect it more closely by looking at the R help documentation. We can do so by typing `?read.csv` from the R console.
+
+As we can see from the help page above, `read.csv` is an offshoot of the more general function `read.table` with some of the arguments set to default values appropriate to CSV files (such as `sep = ','` or `header = TRUE`).  There are many arguments in `read.table` worth knowing about, such as (just to name a few)
+  - `nrows` for limiting the number of rows we read, 
+  - `na.strings` for specifying what defines an NA in a `character` column,  
+  - `skip` for skipping a certain number of rows before we start reading the data.
+
+We now run `read.csv`.  Since the dataset we read is relatively large, we time how long it takes to load it into R.  Once all the data is read, we have an object called `nyc_taxi` loaded into the R session.  This object is an R `data.frame`.  We can run a simple query on `nyc_taxi` by passing it to the `head` function.
+
+
+```{r 1.02 file load }
+st <- Sys.time()
+nyc_taxi <- read.csv(data_path, stringsAsFactors = FALSE) # we suppress conversion to factors for now
+Sys.time() - st
+```
+
+It is important to know that `nyc_taxi` is no longer linked to the original CSV file: The CSV file resides somewhere on disk, but `nyc_taxi` is a **copy** of the CSV file sitting in memory.  Any modifications we make to this file will not be written to the CSV file, or any file on disk, unless we explicitly do so.  Let's begin by comparing the size of the original CSV file with the size of its copy in the R session.
+
+## Section 2: Formatting Dates and Filtering Data
+
+```{r 2.01}
+library(lubridate)
+Sys.setenv(TZ = "US/Eastern") # not important for this dataset, but this is how we set the time zone
+```
+
+The function we need is called `ymd_hms`. We now apply the transformation to the whole data and overwrite the original column with it.
+
+
+```{r 2.01}
+nyc_taxi <- transform(nyc_taxi,
+                      tpep_pickup_datetime = ymd_hms(tpep_pickup_datetime, tz = "US/Eastern"),
+                      tpep_dropoff_datetime = ymd_hms(tpep_dropoff_datetime, tz = "US/Eastern"))
+```
+
+Let's also change the column names from `tpep_pickup_datetime` to `pickup_datetime` and `tpep_dropoff_datetime` to `dropoff_datetime`.
+
+
+```{r 2.03}
+names(nyc_taxi)[2:3] <- c('pickup_datetime', 'dropoff_datetime')
+```
+
+It's time to clean the the longitude and latitude columns. We will do so by simply replacing the values that are outside of the acceptable range with NAs. NAs are the appropriate way to handle missing values in R. We are assuming that those values were mistakenly recorded and are as good as NAs. In some cases, this may not be a safe assumption.
+
+To perform this transformation we use the `transform` function:
+
+
+```{r 2.04}
+nyc_taxi <- transform(nyc_taxi,
+                      pickup_longitude = ifelse(pickup_longitude < -75 | pickup_longitude > -73, NA, pickup_longitude),
+                      dropoff_longitude = ifelse(dropoff_longitude < -75 | dropoff_longitude > -73, NA, dropoff_longitude),
+                      pickup_latitude = ifelse(pickup_latitude < 38 | pickup_latitude > 41, NA, pickup_latitude),
+                      dropoff_latitude = ifelse(dropoff_latitude < 38 | dropoff_latitude > 41, NA, dropoff_latitude)
+)
+```
+
+## Section 3: Creating new features
+
+Features extraction is the process of creating new (and interesting) columns in our data out of the existing columns. Sometimes new features can be directly extracted from one of several columns in the data. For example, we can extract the day of the week from `pickup_datetime` and `dropoff_datetime`. Sometimes new features rely on third-party data. For example, we could have a `holiday_flag` column to know which dates were holidays.
+
+
+The first set of features we extract are date and time related features. Specifically, we would like to know the day of the week and the time of the day (based on our own cutoffs).
+
+
+```{r 3.01}
+library(dplyr)
+library(lubridate)
+weekday_labels <- c('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat')
+cut_levels <- c(1, 5, 9, 12, 16, 18, 22) # used to bucket hour of day into
+hour_labels <- c('1AM-5AM', '5AM-9AM', '9AM-12PM', '12PM-4PM', '4PM-6PM', '6PM-10PM', '10PM-1AM')
+nyc_taxi <- mutate(nyc_taxi, 
+                   pickup_hour = addNA(cut(hour(pickup_datetime), cut_levels)),
+                   pickup_dow = factor(wday(pickup_datetime), levels = 1:7, labels = weekday_labels),
+                   dropoff_hour = addNA(cut(hour(dropoff_datetime), cut_levels)),
+                   dropoff_dow = factor(wday(dropoff_datetime), levels = 1:7, labels = weekday_labels),
+                   trip_duration = as.integer(as.duration(dropoff_datetime - pickup_datetime))
+)
+levels(nyc_taxi$pickup_hour) <- hour_labels
+levels(nyc_taxi$dropoff_hour) <- hour_labels
+
+head(nyc_taxi)
+```
+
+Also, let's remove any NA's as a result of the previous step.
+
+```{r 3.02}
+nyc_taxi <- na.omit(nyc_taxi)
+```
+
+## Section 4: Predicting Stuff
+
+Now that we have our data in the correct shape (and now that it's relatively clean), let's predict a few things using some simple machine learning examples.
+
+First, we can create a simple linear regression model to predict tip amount
+
+```{r 4.01}
+lmformula <- as.formula(tip_amount ~ total_amount + fare_amount)
+fit <- lm(lmformula, data = nyc_taxi)
+summary(fit)
+```
+
+Is this model good enough? (or should we add more variables?)
+
+```{r 4.02}
+newformula <- as.formula(tip_amount ~ 
+                           total_amount + 
+                           tolls_amount +
+                           fare_amount + 
+                           extra +
+                           mta_tax +
+                           #improvement_surcharge + 
+                           pickup_hour + 
+                           pickup_dow +
+                           dropoff_hour + 
+                           dropoff_dow + 
+                           trip_duration - 
+                           1)
+fit <- lm(newformula, data = nyc_taxi)
+summary(fit)
+
+```
+
+Now that we have a `good model`, let's predict the tip amounts and assign them to a new column.
+
+```{r 4.03}
+nyc_taxi$predicted_tip <- predict(fit, data = nyc_taxi)
+head(nyc_taxi)
+```
+
+Now that we have the tip prediction, let's make a quick decision tree to predict.
+
+```{r 4.04}
+library(rpart)
+dtformula <- as.formula(dropoff_dow ~
+                           tip_amount +
+                           total_amount + 
+                           tolls_amount +
+                           fare_amount + 
+                           extra +
+                           mta_tax +
+                           improvement_surcharge + 
+                           pickup_hour + 
+                           pickup_dow +
+                           dropoff_hour + 
+                           trip_duration)
+dtmodel <- rpart(dtformula, data = nyc_taxi)
+nyc_taxi$predicted_dropoff_dow <- predict(dtmodel, data = nyc_taxi, type = "class")
+
+```
+
+## Section 5: Plotting Predictions in ggplot2
+
+Below are a few examples of plotting the predictions along with actual data.
+View other samples here: http://www.r-graph-gallery.com/portfolio/ggplot2-package/
+
+```{r 5.01}
+#Visualization of the tip amount vs. the prediction
+library(ggplot2)
+library(ggExtra)
+
+
+# classic plot :
+p <- nyc_taxi %>%
+      filter(tip_amount < 250) %>%
+      ggplot(aes(x=tip_amount,
+                 y=predicted_tip,
+                 color=dropoff_dow,
+                 size=trip_distance)) +
+      geom_point() +
+      theme(legend.position="none")
+ 
+# with marginal histogram
+ggMarginal(p, type="histogram")
+ 
+```
+
+```{r 5.02}
+#Plot of DOW Prediction
+# To change the color of the gradation :
+nyc_taxi %>%
+      filter(tip_amount < 20) %>%
+      ggplot(aes(dropoff_dow, predicted_dropoff_dow)) +
+      geom_tile(aes(fill = tip_amount)) + 
+    theme_bw() + 
+    scale_fill_gradient(low="blue", high="green") 
+
+
+```
