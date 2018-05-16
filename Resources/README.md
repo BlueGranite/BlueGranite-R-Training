@@ -31,3 +31,7 @@
   * [randomforest](https://cran.r-project.org/web/packages/randomForest/randomForest.pdf) for random forest generation
   * [nnet](https://cran.r-project.org/web/packages/nnet/nnet.pdf) for simple neural networks
   *	[e1071](https://cran.r-project.org/web/packages/e1071/e1071.pdf) for SVMs, Naïve Bayes, Fourier transforms, and clustering
+  * Microsoft Machine Learning Server:
+    * [Introduction for ML Server](https://docs.microsoft.com/en-us/machine-learning-server/what-is-machine-learning-server)
+    * [RevoScaleR](https://docs.microsoft.com/en-us/machine-learning-server/r-reference/revoscaler/revoscaler)
+    * [MicrosoftML](https://docs.microsoft.com/en-us/machine-learning-server/r-reference/microsoftml/microsoftml-package)
