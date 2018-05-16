@@ -1,8 +1,9 @@
 # Data Download Links
+*Make sure to download and extract these files into your **"C:\Data\NYC_Taxi"** folder*
 
 Day 1:
-* Taxi Dataset - https://bgmrstraining.blob.core.windows.net/lab-data/NYC_sample.csv
-* Zillow Shapefile - https://github.com/Azure/LearnAnalytics-DoingDataAnalysisusingRandMicrosoftROpen/tree/master/ZillowNeighborhoods-NY
+* Taxi Dataset - [NYC_sample.zip](NYC_sample.zip?raw=true)
+* Zillow Shapefile - [ZillowNeighborhoods-NY.zip](ZillowNeighborhoods-NY.zip?raw=true)
 
 Day 2
 * Taxi Dataset 01 - https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv
