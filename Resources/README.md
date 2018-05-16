@@ -3,7 +3,7 @@
 ## Books:
 *	R for Data Science - http://r4ds.had.co.nz/
 *	R Packages - http://r-pkgs.had.co.nz/
-*	R for SAS and SPSS Users: http://r4stats.com/books/r4sas-spss/
+*	R for SAS and SPSS Users: http://r4stats.com/books/r4sas-spss/ [Book Link](https://science.nature.nps.gov/im/datamgmt/statistics/r/documents/r_for_sas_spss_users.pdf)
 *	ggplot2 Reference: https://www.amazon.com/dp/0387981403/ref=cm_sw_su_dp?tag=ggplot2-20
 
 ## Packages:
