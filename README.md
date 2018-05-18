@@ -26,3 +26,5 @@
 ## Addional Resources
 * **[Required Data](Data/)**
 * **[Books, Packages and More](Resources/)**
+
+<h4 align = "right">To sign up for our training, <a href = "https://www.blue-granite.com/contact-us">Contact us</a></h2>
